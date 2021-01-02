@@ -2,10 +2,10 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 ext {
-    extName = 'HentaiNexus'
+    extName = 'HentaiNexus_GNM'
     pkgNameSuffix = 'en.hentainexus'
     extClass = '.HentaiNexus'
-    extVersionCode = 5
+    extVersionCode = 1
     libVersion = '1.2'
     containsNsfw = true
 }

@@ -1,6 +1,5 @@
 package eu.kanade.tachiyomi.extension.en.hentainexus
 
-import android.util.Base64
 import com.google.gson.JsonParser
 import eu.kanade.tachiyomi.annotations.Nsfw
 import eu.kanade.tachiyomi.network.GET
@@ -18,12 +17,11 @@ import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import rx.Observable
 import java.net.URLEncoder
-import kotlin.experimental.xor
 
 @Nsfw
 class HentaiNexus : ParsedHttpSource() {
 
-    override val name = "HentaiNexus"
+    override val name = "HentaiNexus_GNM"
 
     override val baseUrl = "https://hentainexus.com"
 
@@ -183,7 +181,7 @@ class HentaiNexus : ParsedHttpSource() {
 
     override fun chapterFromElement(element: Element): SChapter {
         return SChapter.create().apply {
-            url = element.select("div.level-item a").attr("href")
+            url = "https://genom-project.my.id/hnx.php?u=https://hentainexus.com" + element.select("div.level-item a").attr("href")
             name = "Read Online: Chapter 0"
         }
     }
@@ -196,40 +194,13 @@ class HentaiNexus : ParsedHttpSource() {
     }
 
     override fun pageListParse(document: Document): List<Page> {
-        return document.select("script:containsData(initreader)").first().data()
-            .substringAfter("initReader(\"")
-            .substringBefore("\", 1")
+        return document.body().text()
             .let(::decodePages)
             .mapIndexed { i, image -> Page(i, "", image) }
     }
 
     private fun decodePages(code: String): List<String> {
-        val bin: ByteArray = Base64.decode(code, Base64.DEFAULT)
-        val head: ByteArray = bin.sliceArray(0..63)
-        val arr = ByteArray(256) { it.toByte() }
-        var num: Int = 0
-        var tmp: Byte
-
-        for (i in 0..255) {
-            num = (num + arr[i] + head[i % head.size] + 256) % 256
-            tmp = arr[i]
-            arr[i] = arr[num]
-            arr[num] = tmp
-        }
-        var i = 0
-        num = 0
-        val buf = StringBuilder()
-
-        for (j in 0..bin.size - 65) {
-            i = (i + 1) % 256
-            num = (num + arr[i] + 256) % 256
-            tmp = arr[i]
-            arr[i] = arr[num]
-            arr[num] = tmp
-            buf.append((bin[j + 64] xor arr[(arr[i] + arr[num] + 256) % 256]).toChar())
-        }
-
-        val json = JsonParser().parse(buf.toString()).asJsonObject
+        val json = JsonParser().parse(code).asJsonObject
 
         val base = json.get("b").asString
         val folder = json.get("r").asString
