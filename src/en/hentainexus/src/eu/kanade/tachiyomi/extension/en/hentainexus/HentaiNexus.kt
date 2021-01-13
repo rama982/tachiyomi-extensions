@@ -194,20 +194,11 @@ class HentaiNexus : ParsedHttpSource() {
     }
 
     override fun pageListParse(document: Document): List<Page> {
-        return document.body().text()
-            .let(::decodePages)
-            .mapIndexed { i, image -> Page(i, "", image) }
-    }
-
-    private fun decodePages(code: String): List<String> {
+        val code = document.body().text()
         val json = JsonParser().parse(code).asJsonObject
 
-        val base = json.get("b").asString
-        val folder = json.get("r").asString
-        val id = json.get("i").asString
-        return json.get("f").asJsonArray.map { it ->
-            val page = it.asJsonObject
-            "${base}${folder}${page.get("h").asString}/$id/${page.get("p").asString}"
+        return json.get("pages").asJsonArray.mapIndexed { i, image ->
+            Page(i, "", image.asString)
         }
     }
 
