@@ -213,6 +213,7 @@ class MadaraFactory : SourceFactory {
         WebtoonXYZ(),
         WeScans(),
         WoopRead(),
+        WorldRomance(),
         WuxiaWorld(),
         YaoiToshokan(),
         YokaiJump(),
@@ -1501,3 +1502,5 @@ class Voidscans : Madara("Void Scans", "https://voidscans.com", "en") {
 class GeceninLordu : Madara("Gecenin Lordu", "https://geceninlordu.com/", "tr", SimpleDateFormat("dd MMM yyyy", Locale("tr"))) {
     override fun searchMangaRequest(page: Int, query: String, filters: FilterList) = GET("$baseUrl/?s=$query&post_type=wp-manga")
 }
+
+class WorldRomance : Madara("World Romance", "https://wrt.my.id", "id", SimpleDateFormat("d MMMM yyyy", Locale.forLanguageTag("id")))
